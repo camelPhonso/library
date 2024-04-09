@@ -16,7 +16,7 @@ namespace Library.Api.Data
             modelBuilder
                 .Entity<Author>()
                 .HasData(
-                    new Author { Id = Guid.NewGuid(), Name = "Stphen King" },
+                    new Author { Id = Guid.NewGuid(), Name = "Stephen King" },
                     new Author { Id = Guid.NewGuid(), Name = "Margaret Atwood" },
                     new Author { Id = Guid.NewGuid(), Name = "Haruki Murakami" }
                 );
