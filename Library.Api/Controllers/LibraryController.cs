@@ -8,9 +8,14 @@ namespace Library.Api.Controllers
     [Route("api/[controller]/[action]")]
     public class LibraryController : Controller
     {
-        private readonly ApiContext _context;
+        private readonly IApiContext _context;
 
         public LibraryController(ApiContext context)
+        {
+            _context = context;
+        }
+
+        public LibraryController(IApiContext context)
         {
             _context = context;
         }

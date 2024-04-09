@@ -3,7 +3,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Library.Api.Data
 {
-    public class ApiContext : DbContext
+    public interface IApiContext
+    {
+        public DbSet<Author> Authors { get; set; }
+        public DbSet<Book> Books { get; set; }
+    }
+
+    public class ApiContext : DbContext, IApiContext
     {
         public DbSet<Author> Authors { get; set; }
         public DbSet<Book> Books { get; set; }
