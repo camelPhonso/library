@@ -18,7 +18,7 @@ app.UseSwaggerUI();
 
 using (var scope = app.Services.CreateScope())
 {
-    using (var db = scope.ServiceProvider.GetService<ApiContext>())
+    using (var db = scope.ServiceProvider.GetService<ApiContext>()!)
     {
         db.Database.EnsureCreated();
     }
