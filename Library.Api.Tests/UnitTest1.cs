@@ -1,4 +1,4 @@
-namespace Librabry.Api.Tests;
+namespace Library.Api.Tests;
 
 public class UnitTest1
 {
