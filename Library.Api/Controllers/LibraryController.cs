@@ -1,4 +1,6 @@
 using Library.Api.Data;
+using Library.Api.Models;
+using Library.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,24 +10,67 @@ namespace Library.Api.Controllers
     [Route("api/[controller]/[action]")]
     public class LibraryController : Controller
     {
-        private readonly IApiContext _context;
+        private readonly LibraryService _service;
 
-        public LibraryController(ApiContext context)
+        public LibraryController(LibraryService service)
         {
-            _context = context;
-        }
-
-        public LibraryController(IApiContext context)
-        {
-            _context = context;
+            _service = service;
         }
 
         [HttpGet]
-        public JsonResult GetAllAuthors()
+        public IActionResult GetAllAuthors()
         {
-            var result = from author in _context.Authors select author;
+            try
+            {
+                var result = _service.GetAllAuthors();
+                return new JsonResult(Ok(result));
+            }
+            catch (Exception exception)
+            {
+                return new JsonResult(BadRequest(exception.Message));
+            }
+        }
 
-            return new JsonResult(result);
+        [HttpPost]
+        public IActionResult AddAuthor(Author newAuthor)
+        {
+            try
+            {
+                var result = _service.AddAuthor(newAuthor);
+                return new JsonResult(Ok(result));
+            }
+            catch (Exception exception)
+            {
+                return new JsonResult(BadRequest(exception.Message));
+            }
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteAuthor(Author author)
+        {
+            try
+            {
+                var result = _service.DeleteAuthor(author);
+                return new JsonResult(Ok(result));
+            }
+            catch (Exception exception)
+            {
+                return new JsonResult(NotFound(exception.Message));
+            }
+        }
+
+        [HttpPost]
+        public IActionResult UpdateAuthor(Author author)
+        {
+            try
+            {
+                var result = _service.UpdateAuthor(author);
+                return new JsonResult(Ok(result));
+            }
+            catch (Exception exception)
+            {
+                return new JsonResult(BadRequest(exception.Message));
+            }
         }
     }
 }

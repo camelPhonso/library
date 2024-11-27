@@ -11,7 +11,5 @@ import AddAuthorForm from "./components/AddAuthorForm.vue"
     </div>
   </header>
 
-  <main>
-    
-  </main>
+  <main></main>
 </template>
