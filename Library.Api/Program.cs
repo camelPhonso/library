@@ -7,8 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddDbContext<ApiContext>(options => options.UseInMemoryDatabase("LibraryDb"));
-builder.Services.AddSingleton<LibraryService>();
+builder.Services.AddDbContext<IApiContext, ApiContext>(options =>
+    options.UseInMemoryDatabase("LibraryDb")
+);
+builder.Services.AddScoped<LibraryService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
@@ -53,7 +55,7 @@ var summaries = new[]
     "Balmy",
     "Hot",
     "Sweltering",
-    "Scorching"
+    "Scorching",
 };
 
 app.MapGet(

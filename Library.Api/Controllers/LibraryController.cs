@@ -18,12 +18,12 @@ namespace Library.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllAuthors()
+        public async Task<IActionResult> GetAllAuthors(int? index, int? quantity)
         {
             try
             {
-                var result = _service.GetAllAuthors();
-                return new JsonResult(Ok(result));
+                var result = await _service.GetAllAuthors(index ?? 1, quantity ?? 2);
+                return Ok(result);
             }
             catch (Exception exception)
             {
