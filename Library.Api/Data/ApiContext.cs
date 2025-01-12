@@ -7,6 +7,7 @@ namespace Library.Api.Data
     {
         public DbSet<Author> Authors { get; set; }
         public DbSet<Book> Books { get; set; }
+        public int SaveChanges();
     }
 
     public class ApiContext : DbContext, IApiContext
@@ -17,6 +18,10 @@ namespace Library.Api.Data
         public ApiContext(DbContextOptions options)
             : base(options) { }
 
+        public override int SaveChanges()
+        {
+            return base.SaveChanges();
+        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder
@@ -34,19 +39,19 @@ namespace Library.Api.Data
                     {
                         Id = Guid.NewGuid(),
                         Author = "Haruki Murakami",
-                        Title = "Kafka On The Shore"
+                        Title = "Kafka On The Shore",
                     },
                     new Book
                     {
                         Id = Guid.NewGuid(),
                         Author = "Haruki Murakami",
-                        Title = "Norwegian Wood"
+                        Title = "Norwegian Wood",
                     },
                     new Book
                     {
                         Id = Guid.NewGuid(),
                         Author = "Margaret Atwood",
-                        Title = "The Testaments"
+                        Title = "The Testaments",
                     }
                 );
 
