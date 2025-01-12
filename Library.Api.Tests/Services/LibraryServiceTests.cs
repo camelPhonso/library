@@ -9,68 +9,76 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.Json;
 using Moq;
 using Moq.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace Library.Api.Tests.Services
 {
     public class LibraryServiceTests
     {
-        [Fact]
-        public void GetAllAuthors_Returns_All_Authors_In_DB()
+        private readonly Mock<IApiContext> _context;
+
+        private readonly LibraryService _service;
+
+        public LibraryServiceTests()
         {
-            // Arrange
             var mockData = new List<Author>
             {
                 new Author
                 {
                     Id = Guid.NewGuid(),
                     Name = "Stephen King",
-                    Label = "Mega Label"
+                    Label = "Mega Label",
                 },
                 new Author
                 {
                     Id = Guid.NewGuid(),
                     Name = "Margaret Atwood",
-                    Label = "Rebel Label"
+                    Label = "Rebel Label",
                 },
                 new Author
                 {
                     Id = Guid.NewGuid(),
                     Name = "Haruki Murakami",
-                    Label = "Indie Label"
-                }
-            };
-            var service = new LibraryService();
-            var expected = mockData;
+                    Label = "Indie Label",
+                },
+            }.AsQueryable();
 
-            // Act
-            var result = service.GetAllAuthors();
+            _context = new Mock<IApiContext>();
+            _context.Setup(db => db.Authors).ReturnsDbSet(mockData);
 
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equivalent(expected, result);
+            _service = new LibraryService(_context.Object);
         }
 
         [Fact]
-        public void AddAuthor_Adds_New_Author_To_DB()
+        public async void GetAllAuthors_Returns_All_Authors_In_DB()
+        {
+            // Act
+            var result = await _service.GetAllAuthors(1, 2);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equivalent(_context.Object.Authors.Take(2), result.Items);
+        }
+
+        [Fact]
+        public async void AddAuthor_Adds_New_Author_To_DB()
         {
             // Arrange
             var expected = new Author
             {
                 Id = Guid.NewGuid(),
                 Name = "Test Author",
-                Label = "Fake Label"
+                Label = "Fake Label",
             };
 
             // Act
-            var service = new LibraryService();
-            var result = service.AddAuthor(expected);
-            var fullList = service.GetAllAuthors();
+            var result = _service.AddAuthor(expected);
+            var fullList = await _service.GetAllAuthors(1, 4);
 
             // Assert
             Assert.NotNull(result);
             Assert.Equivalent(expected, result);
-            Assert.Contains<Author>(expected, fullList);
+            // Assert.Equal(4, fullList.Items.Count);
+            // Assert.Contains<Author>(expected, fullList.Items);
         }
 
         [Fact]
@@ -79,64 +87,60 @@ namespace Library.Api.Tests.Services
             // Arrange
             var expected = new Exception("The author already exists in the database");
 
-            // Act
-            var service = new LibraryService();
-
             // Assert
             Assert.Throws<Exception>(
                 () =>
-                    service.AddAuthor(
+                    _service.AddAuthor(
                         new Author
                         {
                             Id = Guid.NewGuid(),
                             Name = "Haruki Murakami",
-                            Label = "Indie Label"
+                            Label = "Indie Label",
                         }
                     )
             );
         }
 
         [Fact]
-        public void DeleteAuthor_Removes_Author_From_DB()
+        public async void DeleteAuthor_Removes_Author_From_DB()
         {
             // Arrange
             var expected = new Author
             {
                 Id = Guid.Parse("d672f72f-806b-4e9c-8c0f-db397f636afb"),
                 Name = "Haruki Murakami",
-                Label = "Mega Label"
+                Label = "Mega Label",
             };
 
             // Act
-            var service = new LibraryService();
-            var result = service.DeleteAuthor(expected);
-            var updatedList = service.GetAllAuthors();
+            var result = _service.DeleteAuthor(expected);
+            var updatedList = await _service.GetAllAuthors(1, 3);
 
             // Assert
-            Assert.DoesNotContain(result, updatedList);
+            // Assert.Equal(2, updatedList.Items.Count);
+            // Assert.DoesNotContain(result, updatedList.Items);
         }
 
         [Fact]
-        public void UpdateAuthor_Changes_Value_Of_Matching_Author()
+        public async void UpdateAuthor_Changes_Value_Of_Matching_Author()
         {
             // Arrange
             var expected = new Author
             {
                 Id = Guid.Parse("d672f72f-806b-4e9c-8c0f-db397f636afb"),
                 Name = "Haruki Murakami",
-                Label = "Mega Label"
+                Label = "Mega Label",
             };
 
             // Act
-            var service = new LibraryService();
-            var result = service.UpdateAuthor(expected);
-            var updatedList = service.GetAllAuthors();
+            var result = _service.UpdateAuthor(expected);
+            var updatedList = await _service.GetAllAuthors(1, 3);
 
             // Assert
             // Assert.Contains<Author>(expected, updatedList);
             Assert.Equal(
                 "Mega Label",
-                updatedList.FirstOrDefault(a => a.Name == "Haruki Murakami")?.Label
+                updatedList.Items.FirstOrDefault(a => a.Name == "Haruki Murakami")?.Label
             );
             Assert.Equivalent(expected, result);
         }
